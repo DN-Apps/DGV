@@ -18,12 +18,11 @@ function App() {
   const [submittedData, setSubmittedData] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(true);
 
-useEffect(() => {
-  axios.get('/api/firmen')
-    .then(response => setFirmen(response.data))
-    .catch(error => console.error('Fehler beim Laden der Firmen:', error));
-}, []);
-
+  useEffect(() => {
+    axios.get('/api/firmen')
+      .then(response => setFirmen(response.data))
+      .catch(error => console.error('Fehler beim Laden der Firmen:', error));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,51 +62,39 @@ useEffect(() => {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={cardContainerStyle}>
-        {submittedData && (
-          <>
-            <h2 style={{ margin: 0 }}>
-              {selectedFirma?.name || 'Firma nicht gefunden'}
-            </h2>
-            <p><strong>Vorname Nachname:</strong> {submittedData.vorname} {submittedData.nachname}</p>
-            <p><strong>Jobtitel:</strong> {submittedData.wunschposition}</p>
-            <p><strong>Abteilung:</strong> {submittedData.abteilung}</p>
-            <p><strong>Straße:</strong> {selectedFirma?.strasse || '---'} {selectedFirma?.hausnummer || '---'}</p>
-            <p><strong>PLZ Ort:</strong> {selectedFirma?.plz || '---'} {selectedFirma?.ort || '---'}</p>
-            <p><strong>Telefon:</strong> {submittedData.telefonnummer}</p>
-            <p><strong>Mobil:</strong> {submittedData.mobilnummer}</p>
-            <p><strong>Email:</strong> {submittedData.email}</p>
+    <div style={wrapperStyle}>
+      {submittedData && (
+        <div style={cardContainerStyle}>
+          <h2 style={{ margin: 0 }}>
+            {selectedFirma?.name || 'Firma nicht gefunden'}
+          </h2>
+          <p><strong>Vorname Nachname:</strong> {submittedData.vorname} {submittedData.nachname}</p>
+          <p><strong>Jobtitel:</strong> {submittedData.wunschposition}</p>
+          <p><strong>Abteilung:</strong> {submittedData.abteilung}</p>
+          <p><strong>Straße:</strong> {selectedFirma?.strasse || '---'} {selectedFirma?.hausnummer || '---'}</p>
+          <p><strong>PLZ Ort:</strong> {selectedFirma?.plz || '---'} {selectedFirma?.ort || '---'}</p>
+          <p><strong>Telefon:</strong> {submittedData.telefonnummer}</p>
+          <p><strong>Mobil:</strong> {submittedData.mobilnummer}</p>
+          <p><strong>Email:</strong> {submittedData.email}</p>
 
-            <div style={{
-              marginTop: '20px',
-              textAlign: 'center',
-              padding: '15px',
-              backgroundColor: 'white',
-              borderRadius: '8px'
-            }}>
-              <h3>Kontakt hinzufügen</h3>
-              <p style={{ fontSize: '14px', marginBottom: '10px' }}>
-                Scan mich mit der Kamera-App
-              </p>
-              <QRCode
-                value={generateVCard()}
-                size={160}
-                level="H"
-                bgColor="#ffffff"
-                fgColor="#000000"
-              />
-              <p style={{
-                fontSize: '12px',
-                color: '#666',
-                marginTop: '10px'
-              }}>
-                Funktioniert auf iPhone & Android
-              </p>
-            </div>
-          </>
-        )}
-      </div>
+          <div style={qrContainerStyle}>
+            <h3>Kontakt hinzufügen</h3>
+            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
+              Scan mich mit der Kamera-App
+            </p>
+            <QRCode
+              value={generateVCard()}
+              size={160}
+              level="H"
+              bgColor="#ffffff"
+              fgColor="#000000"
+            />
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+              Funktioniert auf iPhone & Android
+            </p>
+          </div>
+        </div>
+      )}
 
       {isPopupOpen && (
         <div style={popupStyle}>
@@ -138,13 +125,36 @@ useEffect(() => {
 }
 
 // Stile
+const wrapperStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: '100vh',
+  padding: '20px',
+  boxSizing: 'border-box',
+  backgroundColor: '#fafafa',
+};
+
 const cardContainerStyle = {
-  width: '25%',
-  height: '100vh',
+  width: '100%',
+  maxWidth: '500px',
   backgroundColor: '#f0f0f0',
   padding: '20px',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  borderRadius: '10px',
+  textAlign: 'left',
+  marginBottom: '20px'
 };
+
+const qrContainerStyle = {
+  marginTop: '20px',
+  textAlign: 'center',
+  padding: '15px',
+  backgroundColor: 'white',
+  borderRadius: '8px'
+};
+
 const popupStyle = {
   position: 'fixed',
   top: '0',
@@ -154,22 +164,28 @@ const popupStyle = {
   backgroundColor: 'rgba(0,0,0,0.5)',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  padding: '10px',
+  boxSizing: 'border-box'
 };
+
 const popupFormStyle = {
   backgroundColor: '#fff',
   padding: '30px',
   borderRadius: '10px',
-  width: '400px',
+  width: '100%',
+  maxWidth: '400px',
   display: 'flex',
   flexDirection: 'column',
   gap: '10px'
 };
+
 const inputStyle = {
   padding: '10px',
   borderRadius: '5px',
   border: '1px solid #ccc'
 };
+
 const buttonStyle = {
   padding: '10px',
   backgroundColor: '#007BFF',

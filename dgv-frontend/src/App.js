@@ -18,11 +18,12 @@ function App() {
   const [submittedData, setSubmittedData] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(true);
 
-  useEffect(() => {
-    axios.get('http://localhost:5003/api/firmen')
-      .then(response => setFirmen(response.data))
-      .catch(error => console.error('Fehler beim Laden der Firmen:', error));
-  }, []);
+useEffect(() => {
+  axios.get('/api/firmen')
+    .then(response => setFirmen(response.data))
+    .catch(error => console.error('Fehler beim Laden der Firmen:', error));
+}, []);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;

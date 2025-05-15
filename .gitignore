@@ -1,0 +1,12 @@
+# Node modules
+**/node_modules/
+
+# Build outputs
+dgv-frontend/build/
+dist/
+
+# Env-Dateien
+**/.env
+
+# Logs
+*.log

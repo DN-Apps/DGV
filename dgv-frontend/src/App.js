@@ -1,9 +1,187 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import QRCode from 'react-qr-code';
 
+const bekannteFirmen = [
+  { id: 'f1', name: 'SAP SE', adresse: { strasse: 'Dietmar-Hopp-Allee', hausnummer: '16', plz: '69190', ort: 'Walldorf', land: 'Germany' } },
+  { id: 'f2', name: 'BASF SE', adresse: { strasse: 'Carl-Bosch-Str.', hausnummer: '38', plz: '67056', ort: 'Ludwigshafen', land: 'Germany' } },
+  { id: 'f3', name: 'Fuchs Petrolub SE', adresse: { strasse: 'Kundstr.', hausnummer: '1', plz: '68167', ort: 'Mannheim', land: 'Germany' } },
+  { id: 'f4', name: 'HeidelbergCement AG', adresse: { strasse: 'Speyerer Str.', hausnummer: '4', plz: '69115', ort: 'Heidelberg', land: 'Germany' } },
+  { id: 'f5', name: 'John Deere GmbH & Co. KG', adresse: { strasse: 'Hauptstr.', hausnummer: '1', plz: '68309', ort: 'Mannheim', land: 'Germany' } },
+  { id: 'f6', name: 'B. Braun Melsungen AG', adresse: { strasse: 'Carl-Braun-Straße', hausnummer: '1', plz: '68642', ort: 'Heidelberg', land: 'Germany' } },
+  { id: 'f7', name: 'Lufthansa Systems GmbH & Co. KG', adresse: { strasse: 'Heidelberger Str.', hausnummer: '3', plz: '68307', ort: 'Mannheim', land: 'Germany' } },
+  { id: 'f8', name: 'Mann+Hummel GmbH', adresse: { strasse: 'Schwetzinger Str.', hausnummer: '43', plz: '68165', ort: 'Mannheim', land: 'Germany' } },
+  { id: 'f9', name: 'Bilfinger SE', adresse: { strasse: 'Carl-Reiß-Platz', hausnummer: '1-5', plz: '68165', ort: 'Mannheim', land: 'Germany' } },
+  { id: 'f21', name: 'Audi AG', adresse: { strasse: 'Ettinger Str.', hausnummer: '25', plz: '74078', ort: 'Heilbronn', land: 'Germany' } },
+  { id: 'f22', name: 'Mercedes-Benz AG', adresse: { strasse: 'Mercedesstraße', hausnummer: '120', plz: '70327', ort: 'Stuttgart', land: 'Germany' } },
+  { id: 'f23', name: 'Lidl Stiftung & Co. KG', adresse: { strasse: 'Stiftsbergstraße', hausnummer: '1', plz: '74172', ort: 'Neckarsulm', land: 'Germany' } },
+  { id: 'f24', name: 'Robert Bosch GmbH', adresse: { strasse: 'Robert-Bosch-Platz', hausnummer: '1', plz: '70839', ort: 'Gerlingen', land: 'Germany' } },
+  { id: 'f25', name: 'Porsche AG', adresse: { strasse: 'Porscheplatz', hausnummer: '1', plz: '70435', ort: 'Stuttgart', land: 'Germany' } },
+];
+
+// Neue Komponenten für rechtliche Absicherung
+const DatenschutzPopup = ({ onAccept }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      zIndex: 1000,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '10px',
+        maxWidth: '600px',
+        maxHeight: '80vh',
+        overflowY: 'auto'
+      }}>
+        <h2>Datenschutzhinweis</h2>
+        <p>
+          Diese Webseite verwendet keine Cookies und speichert alle eingegebenen Daten ausschließlich lokal in Ihrem Browser.
+          Die Daten werden nicht an Server übertragen oder gespeichert.
+        </p>
+        <button
+          onClick={onAccept}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            marginTop: '20px'
+          }}
+        >
+          Hinweis akzeptieren
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Impressum-Popup Komponente
+const ImpressumPopup = ({ onClose }) => {
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      zIndex: 1000,
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '10px',
+        maxWidth: '600px',
+        maxHeight: '80vh',
+        overflowY: 'auto',
+        position: 'relative'
+      }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: 'none',
+            border: 'none',
+            fontSize: '20px',
+            cursor: 'pointer'
+          }}
+        >
+          ×
+        </button>
+        <h2>Impressum</h2>
+        <p>
+          <strong>Angaben gemäß § 5 TMG:</strong><br />
+          Daniel Nedic<br />
+          Kirchgasse 8<br />
+          74831 Gundelsheim<br />
+          Deutschland
+        </p>
+
+        <p>
+          <strong>Kontakt:</strong><br />
+          Telefon: <a href="tel:+491701071715">0170 1071715</a><br />
+          E-Mail: <a href="mailto:daniel-nedic@hotmail.de">daniel-nedic@hotmail.de</a>
+        </p>
+
+        <p>
+          <strong>Haftungsausschluss:</strong><br />
+          Diese Website dient ausschließlich Demonstrationszwecken.<br />
+          Die dargestellten Inhalte, insbesondere generierte Visitenkarten oder Designbeispiele, haben keine rechtliche Gültigkeit und stellen kein geschäftliches Angebot dar.<br />
+          Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+        </p>
+
+      </div>
+    </div>
+  );
+};
+
+// Footer-Komponente mit Link zum Impressum
+const Footer = ({ onImpressumClick }) => {
+  return (
+    <footer style={{
+      position: 'fixed',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: '#f8f9fa',
+      padding: '10px 20px',
+      borderTop: '1px solid #dee2e6',
+      fontSize: '12px',
+      zIndex: 99,
+      textAlign: 'center'
+    }}>
+      <a
+        href="#"
+        onClick={(e) => {
+          e.preventDefault();
+          onImpressumClick();
+        }}
+        style={{
+          color: '#007bff',
+          textDecoration: 'none'
+        }}
+      >
+        Impressum
+      </a>
+    </footer>
+  );
+};
+
+const Wasserzeichen = () => {
+  return (
+    <div style={{
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      fontSize: '24px',
+      color: 'rgba(0,0,0,0.1)',
+      pointerEvents: 'none',
+      zIndex: 1,
+      fontWeight: 'bold',
+      whiteSpace: 'nowrap'
+    }}>
+      DEMONSTRATION
+    </div>
+  );
+};
+
 function App() {
-  const [firmen, setFirmen] = useState([]);
   const [formData, setFormData] = useState({
     vorname: '',
     nachname: '',
@@ -14,30 +192,105 @@ function App() {
     email: '',
     firmaId: ''
   });
+  const [firmenListe, setFirmenListe] = useState([]);
   const [selectedFirma, setSelectedFirma] = useState(null);
   const [submittedData, setSubmittedData] = useState(null);
   const [isPopupOpen, setIsPopupOpen] = useState(true);
+  const [showDatenschutz, setShowDatenschutz] = useState(
+    localStorage.getItem('datenschutzAkzeptiert') !== 'true'
+  );
+  const [showImpressum, setShowImpressum] = useState(false);
 
+  // Dein bestehender useEffect und Methoden bleiben unverändert
   useEffect(() => {
-    axios.get('/api/firmen')
-      .then(response => setFirmen(response.data))
-      .catch(error => console.error('Fehler beim Laden der Firmen:', error));
+    const overpassQuery = `
+      [out:json][timeout:25];
+      node["office"](49.1,8.3,49.6,8.8);
+      out 50;
+    `;
+
+    fetch('https://overpass-api.de/api/interpreter', {
+      method: 'POST',
+      body: overpassQuery,
+      headers: { 'Content-Type': 'text/plain' }
+    })
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP Fehler: ${res.status}`);
+        return res.json();
+      })
+      .then(data => {
+        if (!data.elements || data.elements.length === 0) {
+          setFirmenListe([]);
+          console.log("Keine Elemente von Overpass gefunden");
+          return;
+        }
+        const apiCompaniesRaw = data.elements
+          .filter(el => el.tags && el.tags.name)
+          .map(el => ({
+            id: 'api_' + el.id,
+            name: el.tags.name,
+            adresse: {
+              strasse: el.tags['addr:street'] || '',
+              hausnummer: el.tags['addr:housenumber'] || '',
+              plz: el.tags['addr:postcode'] || '',
+              ort: el.tags['addr:city'] || el.tags['addr:place'] || '',
+              land: el.tags['addr:country'] || 'Germany',
+            }
+          }));
+
+        const bekannteNamen = new Set(bekannteFirmen.map(f => f.name.toLowerCase()));
+        const apiCompaniesFiltered = apiCompaniesRaw.filter(c => !bekannteNamen.has(c.name.toLowerCase()));
+        const combinedCompanies = [...bekannteFirmen, ...apiCompaniesFiltered];
+        combinedCompanies.sort((a, b) => a.name.localeCompare(b.name));
+
+        setFirmenListe(combinedCompanies);
+      })
+      .catch(err => {
+        console.error('Fehler beim Laden der Firmenliste:', err);
+      });
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
 
     if (name === 'firmaId') {
-      const firma = firmen.find(f => f.id === parseInt(value));
-      setSelectedFirma(firma || null);
+      const selected = firmenListe.find(f => f.id.toString() === value);
+      if (selected) {
+        setSelectedFirma({
+          name: selected.name,
+          ...selected.adresse
+        });
+      } else {
+        setSelectedFirma(null);
+      }
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.firmaId) return;
     setSubmittedData(formData);
     setIsPopupOpen(false);
+  };
+
+  const handleReset = () => {
+    setFormData({
+      vorname: '',
+      nachname: '',
+      wunschposition: '',
+      abteilung: '',
+      telefonnummer: '',
+      mobilnummer: '',
+      email: '',
+      firmaId: ''
+    });
+    setSelectedFirma(null);
+  };
+
+  const handleBack = () => {
+    setIsPopupOpen(true);
+    setSubmittedData(null);
   };
 
   const generateVCard = () => {
@@ -46,6 +299,7 @@ function App() {
     const vCardLines = [
       'BEGIN:VCARD',
       'VERSION:3.0',
+      `NOTE:Diese Visitenkarte dient Demonstrationszwecken\nund stellt keine offizielle Bestätigung dar.`,
       `N:${submittedData.nachname};${submittedData.vorname}`,
       `FN:${submittedData.vorname} ${submittedData.nachname}`,
       `ORG:${selectedFirma.name}`,
@@ -53,7 +307,7 @@ function App() {
       `TEL;TYPE=WORK,VOICE:${submittedData.telefonnummer}`,
       `TEL;TYPE=CELL:${submittedData.mobilnummer}`,
       `EMAIL:${submittedData.email}`,
-      `ADR;TYPE=WORK:;;${selectedFirma.strasse} ${selectedFirma.hausnummer};${selectedFirma.ort};;${selectedFirma.plz};Germany`,
+      `ADR;TYPE=WORK:;;${selectedFirma.strasse} ${selectedFirma.hausnummer};${selectedFirma.ort};;${selectedFirma.plz};${selectedFirma.land}`,
       `REV:${new Date().toISOString()}`,
       'END:VCARD'
     ];
@@ -61,27 +315,58 @@ function App() {
     return vCardLines.join('\n');
   };
 
+  const handleAcceptDatenschutz = () => {
+    localStorage.setItem('datenschutzAkzeptiert', 'true');
+    setShowDatenschutz(false);
+  };
+
   return (
-    <div style={wrapperStyle}>
-      {submittedData && (
-        <div style={cardContainerStyle}>
+    <>
+      {showDatenschutz && <DatenschutzPopup onAccept={handleAcceptDatenschutz} />}
+      {showImpressum && <ImpressumPopup onClose={() => setShowImpressum(false)} />}
+
+      <Footer onImpressumClick={() => setShowImpressum(true)} />
+
+      {submittedData ? (
+        <div style={{
+          ...wrapperStyle,
+          ...cardContainerStyle,
+          position: 'relative',
+          overflow: 'hidden',
+          marginBottom: '60px'
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            backgroundColor: 'rgba(255,0,0,0.1)',
+            padding: '5px 10px',
+            borderRadius: '5px',
+            fontSize: '12px',
+            border: '1px dashed red'
+          }}>
+            DEMONSTRATION
+          </div>
+
           <h2 style={{ margin: 0 }}>
-            {selectedFirma?.name || 'Firma nicht gefunden'}
+            {selectedFirma?.name || 'Firma nicht verfügbar'}
           </h2>
+          <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
+            Diese digitale Visitenkarte dient nur Demonstrationszwecken.
+          </p>
+
           <p><strong>Vorname Nachname:</strong> {submittedData.vorname} {submittedData.nachname}</p>
-          <p><strong>Jobtitel:</strong> {submittedData.wunschposition}</p>
-          <p><strong>Abteilung:</strong> {submittedData.abteilung}</p>
-          <p><strong>Straße:</strong> {selectedFirma?.strasse || '---'} {selectedFirma?.hausnummer || '---'}</p>
-          <p><strong>PLZ Ort:</strong> {selectedFirma?.plz || '---'} {selectedFirma?.ort || '---'}</p>
-          <p><strong>Telefon:</strong> {submittedData.telefonnummer}</p>
-          <p><strong>Mobil:</strong> {submittedData.mobilnummer}</p>
-          <p><strong>Email:</strong> {submittedData.email}</p>
+          <p><strong>Position:</strong> {submittedData.wunschposition || 'Position nicht verfügbar'}</p>
+          <p><strong>Abteilung:</strong> {submittedData.abteilung || 'Abteilung nicht verfügbar'}</p>
+
+          {/* Angepasste Adressanzeige mit Platzhaltern */}
+          <p><strong>Straße:</strong> {selectedFirma?.strasse || 'Straße nicht verfügbar'} {selectedFirma?.hausnummer || ''}</p>
+          <p><strong>PLZ Ort:</strong> {selectedFirma?.plz || 'PLZ nicht verfügbar'} {selectedFirma?.ort || 'Ort nicht verfügbar'}</p>
+
+          <p><strong>Mobil:</strong> {submittedData.telefonnummer || 'Telefon nicht verfügbar'}</p>
+          <p><strong>Email:</strong> {submittedData.email || 'Email nicht verfügbar'}</p>
 
           <div style={qrContainerStyle}>
-            <h3>Kontakt hinzufügen</h3>
-            <p style={{ fontSize: '14px', marginBottom: '10px' }}>
-              Scan mich mit der Kamera-App
-            </p>
             <QRCode
               value={generateVCard()}
               size={160}
@@ -90,109 +375,121 @@ function App() {
               fgColor="#000000"
             />
             <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-              Funktioniert auf iPhone & Android
+              Scan mit Kamera-App (funktioniert auf iOS & Android)
             </p>
           </div>
-        </div>
-      )}
 
-      {isPopupOpen && (
-        <div style={popupStyle}>
-          <form onSubmit={handleSubmit} style={popupFormStyle}>
-            <h2>Generiere deine Visitenkarte</h2>
-            <h3>Informationen eingeben</h3>
-            <input type="text" name="vorname" placeholder="Vorname" value={formData.vorname} onChange={handleChange} required style={inputStyle} />
-            <input type="text" name="nachname" placeholder="Nachname" value={formData.nachname} onChange={handleChange} required style={inputStyle} />
-            <input type="text" name="wunschposition" placeholder="Wunschposition" value={formData.wunschposition} onChange={handleChange} required style={inputStyle} />
-            <input type="text" name="abteilung" placeholder="Abteilung" value={formData.abteilung} onChange={handleChange} required style={inputStyle} />
-            <input type="text" name="telefonnummer" placeholder="Telefonnummer" value={formData.telefonnummer} onChange={handleChange} style={inputStyle} />
-            <input type="text" name="mobilnummer" placeholder="Mobilnummer" value={formData.mobilnummer} onChange={handleChange} style={inputStyle} />
-            <input type="email" name="email" placeholder="E-Mail-Adresse" value={formData.email} onChange={handleChange} required style={inputStyle} />
-            <select name="firmaId" value={formData.firmaId} onChange={handleChange} required style={inputStyle}>
-              <option value="">Firma auswählen</option>
-              {firmen.map(company => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
-            </select>
-            <button type="submit" style={buttonStyle}>Speichern</button>
-          </form>
+          <Wasserzeichen />
+
+          <button onClick={handleBack} style={{ ...buttonStyle, marginTop: '20px', backgroundColor: '#6c757d' }}>
+            Zurück
+          </button>
         </div>
+      ) : (
+        isPopupOpen && (
+          <div style={popupStyle}>
+            <form onSubmit={handleSubmit} style={popupFormStyle}>
+              <h2>Generiere deine Visitenkarte</h2>
+              <p style={{ fontSize: '12px', color: '#666', marginBottom: '20px' }}>
+                Hinweis: Diese Anwendung erstellt nur Demonstrations-Visitenkarten.
+              </p>
+
+              <input type="text" name="vorname" placeholder="Vorname" value={formData.vorname} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="nachname" placeholder="Nachname" value={formData.nachname} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="wunschposition" placeholder="Position" value={formData.wunschposition} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="abteilung" placeholder="Abteilung" value={formData.abteilung} onChange={handleChange} style={inputStyle} />
+              <input type="tel" name="telefonnummer" placeholder="Mobil" value={formData.telefonnummer} onChange={handleChange} style={inputStyle} />
+              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required style={inputStyle} />
+
+              <select name="firmaId" onChange={handleChange} required value={formData.firmaId} style={selectStyle}>
+                <option value="">Firma wählen</option>
+                {firmenListe.map(firma => (
+                  <option key={firma.id} value={firma.id}>{firma.name}</option>
+                ))}
+              </select>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+                <button type="button" onClick={handleReset} style={{ ...buttonStyle, backgroundColor: '#6c757d' }}>
+                  Zurücksetzen
+                </button>
+                <button type="submit" style={buttonStyle}>
+                  Generieren
+                </button>
+              </div>
+            </form>
+          </div>
+        )
       )}
-    </div>
+    </>
   );
 }
 
-// Stile
+// Stile (unverändert)
 const wrapperStyle = {
+  fontFamily: 'Arial, sans-serif',
+  maxWidth: '440px',
+  margin: '40px auto',
+  padding: '15px',
+  border: '1px solid #ccc',
+  borderRadius: '8px',
+  boxShadow: '0 0 10px rgba(0,0,0,0.15)',
+  backgroundColor: '#fff',
+};
+
+const popupStyle = {
+  position: 'fixed',
+  top: '10%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  backgroundColor: 'white',
+  borderRadius: '10px',
+  padding: '30px 20px',
+  boxShadow: '0 0 15px rgba(0,0,0,0.3)',
+  zIndex: 100,
+  width: '400px',
+  maxHeight: '80vh',
+  overflowY: 'auto',
+};
+
+const popupFormStyle = {
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minHeight: '100vh',
-  padding: '20px',
-  boxSizing: 'border-box',
-  backgroundColor: '#fafafa',
+  gap: '10px',
+};
+
+const inputStyle = {
+  padding: '8px',
+  fontSize: '14px',
+  borderRadius: '6px',
+  border: '1px solid #ccc',
+};
+
+const selectStyle = {
+  padding: '8px',
+  fontSize: '14px',
+  borderRadius: '6px',
+  border: '1px solid #ccc',
+};
+
+const buttonStyle = {
+  padding: '10px 18px',
+  fontSize: '16px',
+  cursor: 'pointer',
+  backgroundColor: '#007bff',
+  border: 'none',
+  borderRadius: '6px',
+  color: 'white',
+  fontWeight: '600',
 };
 
 const cardContainerStyle = {
-  width: '100%',
-  maxWidth: '500px',
-  backgroundColor: '#f0f0f0',
-  padding: '20px',
-  boxSizing: 'border-box',
-  borderRadius: '10px',
   textAlign: 'left',
-  marginBottom: '20px'
+  padding: '15px 20px',
 };
 
 const qrContainerStyle = {
   marginTop: '20px',
   textAlign: 'center',
-  padding: '15px',
-  backgroundColor: 'white',
-  borderRadius: '8px'
-};
-
-const popupStyle = {
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100vw',
-  height: '100vh',
-  backgroundColor: 'rgba(0,0,0,0.5)',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '10px',
-  boxSizing: 'border-box'
-};
-
-const popupFormStyle = {
-  backgroundColor: '#fff',
-  padding: '30px',
-  borderRadius: '10px',
-  width: '100%',
-  maxWidth: '400px',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '10px'
-};
-
-const inputStyle = {
-  padding: '10px',
-  borderRadius: '5px',
-  border: '1px solid #ccc'
-};
-
-const buttonStyle = {
-  padding: '10px',
-  backgroundColor: '#007BFF',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '5px',
-  cursor: 'pointer'
 };
 
 export default App;

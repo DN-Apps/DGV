@@ -139,11 +139,13 @@ const Footer = ({ onImpressumClick }) => {
       left: 0,
       right: 0,
       backgroundColor: '#f8f9fa',
-      padding: '10px 20px',
+      padding: '10px',
       borderTop: '1px solid #dee2e6',
       fontSize: '12px',
       zIndex: 99,
-      textAlign: 'center'
+      textAlign: 'center',
+      width: '100%',
+      boxSizing: 'border-box',
     }}>
       <a
         href="#"
@@ -369,7 +371,7 @@ function App() {
           <div style={qrContainerStyle}>
             <QRCode
               value={generateVCard()}
-              size={160}
+              size={window.innerWidth < 480 ? 120 : 160}
               level="H"
               bgColor="#ffffff"
               fgColor="#000000"
@@ -428,6 +430,7 @@ function App() {
 const wrapperStyle = {
   fontFamily: 'Arial, sans-serif',
   maxWidth: '440px',
+  width: '95%',
   margin: '40px auto',
   padding: '15px',
   border: '1px solid #ccc',
@@ -438,17 +441,19 @@ const wrapperStyle = {
 
 const popupStyle = {
   position: 'fixed',
-  top: '10%',
+  top: '5%',
   left: '50%',
   transform: 'translateX(-50%)',
   backgroundColor: 'white',
   borderRadius: '10px',
-  padding: '30px 20px',
+  padding: '20px',
   boxShadow: '0 0 15px rgba(0,0,0,0.3)',
   zIndex: 100,
-  width: '400px',
-  maxHeight: '80vh',
+  width: '90%',
+  maxWidth: '400px',
+  maxHeight: '90vh',
   overflowY: 'auto',
+  boxSizing: 'border-box'
 };
 
 const popupFormStyle = {
@@ -458,21 +463,21 @@ const popupFormStyle = {
 };
 
 const inputStyle = {
-  padding: '8px',
-  fontSize: '14px',
+  padding: '10px',
+  fontSize: '16px',
   borderRadius: '6px',
   border: '1px solid #ccc',
+  width: '100%',
+  boxSizing: 'border-box',
 };
 
+
 const selectStyle = {
-  padding: '8px',
-  fontSize: '14px',
-  borderRadius: '6px',
-  border: '1px solid #ccc',
+  ...inputStyle,
 };
 
 const buttonStyle = {
-  padding: '10px 18px',
+  padding: '12px',
   fontSize: '16px',
   cursor: 'pointer',
   backgroundColor: '#007bff',
@@ -480,6 +485,8 @@ const buttonStyle = {
   borderRadius: '6px',
   color: 'white',
   fontWeight: '600',
+  width: '100%',
+  boxSizing: 'border-box',
 };
 
 const cardContainerStyle = {

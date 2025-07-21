@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import QRCode from 'react-qr-code';
+import LanguageSelector from './LanguageSelector';
+import { useTranslation } from "react-i18next";
+import "./i18n";
 
 const bekannteFirmen = [
   { id: 'f1', name: 'SAP SE', adresse: { strasse: 'Dietmar-Hopp-Allee', hausnummer: '16', plz: '69190', ort: 'Walldorf', land: 'Germany' } },
@@ -18,8 +21,11 @@ const bekannteFirmen = [
   { id: 'f25', name: 'Porsche AG', adresse: { strasse: 'Porscheplatz', hausnummer: '1', plz: '70435', ort: 'Stuttgart', land: 'Germany' } },
 ];
 
+
+
 // Neue Komponenten für rechtliche Absicherung
 const DatenschutzPopup = ({ onAccept }) => {
+
   return (
     <div style={{
       position: 'fixed',
@@ -67,6 +73,7 @@ const DatenschutzPopup = ({ onAccept }) => {
 
 // Impressum-Popup Komponente
 const ImpressumPopup = ({ onClose }) => {
+  const { t } = useTranslation();
   return (
     <div style={{
       position: 'fixed',
@@ -103,26 +110,26 @@ const ImpressumPopup = ({ onClose }) => {
         >
           ×
         </button>
-        <h2>Impressum</h2>
+        <h2>{t("imprint.heading")}</h2>
         <p>
-          <strong>Angaben gemäß § 5 TMG:</strong><br />
-          Daniel Nedic<br />
-          Kirchgasse 8<br />
-          74831 Gundelsheim<br />
-          Deutschland
+          <strong>{t("imprint.legalInfo")}</strong><br />
+          {t("imprint.name")}<br />
+          {t("imprint.address")}<br />
+          {t("imprint.city")}<br />
+          {t("imprint.country")}
         </p>
 
         <p>
-          <strong>Kontakt:</strong><br />
-          Telefon: <a href="tel:+491701071715">0170 1071715</a><br />
-          E-Mail: <a href="mailto:daniel-nedic@hotmail.de">daniel-nedic@hotmail.de</a>
+          <strong>{t("imprint.contact")}</strong><br />
+          {t("imprint.phoneLabel")} <a href="tel:+491701071715">0170 1071715</a><br />
+          {t("imprint.emailLabel")} <a href="mailto:daniel-nedic@hotmail.de">daniel-nedic@hotmail.de</a>
         </p>
 
         <p>
-          <strong>Haftungsausschluss:</strong><br />
-          Diese Website dient ausschließlich Demonstrationszwecken.<br />
-          Die dargestellten Inhalte, insbesondere generierte Visitenkarten oder Designbeispiele, haben keine rechtliche Gültigkeit und stellen kein geschäftliches Angebot dar.<br />
-          Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.
+          <strong>{t("imprint.disclaimerHeading")}</strong><br />
+          {t("imprint.disclaimer1")}<br />
+          {t("imprint.disclaimer2")}<br />
+          {t("imprint.disclaimer3")}
         </p>
 
       </div>
@@ -132,6 +139,7 @@ const ImpressumPopup = ({ onClose }) => {
 
 // Footer-Komponente mit Link zum Impressum
 const Footer = ({ onImpressumClick }) => {
+  const { t } = useTranslation();
   return (
     <footer style={{
       position: 'fixed',
@@ -158,7 +166,7 @@ const Footer = ({ onImpressumClick }) => {
           textDecoration: 'none'
         }}
       >
-        Impressum
+        {t("imprint.heading")}
       </a>
     </footer>
   );
@@ -183,7 +191,11 @@ const Wasserzeichen = () => {
   );
 };
 
+
+
 function App() {
+
+
   const [formData, setFormData] = useState({
     vorname: '',
     nachname: '',
@@ -301,10 +313,10 @@ function App() {
     const vCardLines = [
       'BEGIN:VCARD',
       'VERSION:3.0',
-      `NOTE:Diese Visitenkarte dient Demonstrationszwecken\nund stellt keine offizielle Bestätigung dar.`,
+      'NOTE:Diese Visitenkarte dient Demonstrationszwecken\\nund stellt keine offizielle Bestätigung dar.',
       `N:${submittedData.nachname};${submittedData.vorname}`,
       `FN:${submittedData.vorname} ${submittedData.nachname}`,
-      `ORG:${selectedFirma.name}`,
+      `ORG:${selectedFirma.name};${submittedData.abteilung || ''}`,
       `TITLE:${submittedData.wunschposition}`,
       `TEL;TYPE=WORK,VOICE:${submittedData.telefonnummer}`,
       `TEL;TYPE=CELL:${submittedData.mobilnummer}`,
@@ -314,6 +326,7 @@ function App() {
       'END:VCARD'
     ];
 
+
     return vCardLines.join('\n');
   };
 
@@ -322,8 +335,11 @@ function App() {
     setShowDatenschutz(false);
   };
 
+  const { t } = useTranslation();
+
   return (
     <>
+      <LanguageSelector></LanguageSelector>
       {showDatenschutz && <DatenschutzPopup onAccept={handleAcceptDatenschutz} />}
       {showImpressum && <ImpressumPopup onClose={() => setShowImpressum(false)} />}
 
@@ -354,19 +370,20 @@ function App() {
             {selectedFirma?.name || 'Firma nicht verfügbar'}
           </h2>
           <p style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
-            Diese digitale Visitenkarte dient nur Demonstrationszwecken.
+            {t("card.demoNotice")}
           </p>
 
-          <p><strong>Vorname Nachname:</strong> {submittedData.vorname} {submittedData.nachname}</p>
-          <p><strong>Position:</strong> {submittedData.wunschposition || 'Position nicht verfügbar'}</p>
-          <p><strong>Abteilung:</strong> {submittedData.abteilung || 'Abteilung nicht verfügbar'}</p>
+          <p><strong>{t("card.firstname")}</strong> {submittedData.vorname} </p>
+          <p><strong>{t("card.lastname")}</strong> {submittedData.nachname}</p>
+          <p><strong>{t("card.position")}</strong> {submittedData.wunschposition || t("card.positionUnavailable")}</p>
+          <p><strong>{t("card.department")}</strong> {submittedData.abteilung || 'Abteilung nicht verfügbar'}</p>
 
           {/* Angepasste Adressanzeige mit Platzhaltern */}
-          <p><strong>Straße:</strong> {selectedFirma?.strasse || 'Straße nicht verfügbar'} {selectedFirma?.hausnummer || ''}</p>
-          <p><strong>PLZ Ort:</strong> {selectedFirma?.plz || 'PLZ nicht verfügbar'} {selectedFirma?.ort || 'Ort nicht verfügbar'}</p>
+          <p><strong>{t("card.street")}</strong> {selectedFirma?.strasse || 'Straße nicht verfügbar'} {selectedFirma?.hausnummer || ''}</p>
+          <p><strong>{t("card.zipCity")}</strong> {selectedFirma?.plz || 'PLZ nicht verfügbar'} {selectedFirma?.ort || 'Ort nicht verfügbar'}</p>
 
-          <p><strong>Mobil:</strong> {submittedData.telefonnummer || 'Telefon nicht verfügbar'}</p>
-          <p><strong>Email:</strong> {submittedData.email || 'Email nicht verfügbar'}</p>
+          <p><strong>{t("card.phone")}</strong> {submittedData.telefonnummer || 'Telefon nicht verfügbar'}</p>
+          <p><strong>{t("card.email")}</strong> {submittedData.email || 'Email nicht verfügbar'}</p>
 
           <div style={qrContainerStyle}>
             <QRCode
@@ -377,7 +394,7 @@ function App() {
               fgColor="#000000"
             />
             <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
-              Scan mit Kamera-App (funktioniert auf iOS & Android)
+              {t("card.qrScanHint")}
             </p>
           </div>
 
@@ -391,20 +408,20 @@ function App() {
         isPopupOpen && (
           <div style={popupStyle}>
             <form onSubmit={handleSubmit} style={popupFormStyle}>
-              <h2>Generiere deine Visitenkarte</h2>
+              <h2 style={{ fontSize: '20px' }}>{t("card.heading")}</h2>
               <p style={{ fontSize: '12px', color: '#666', marginBottom: '20px' }}>
-                Hinweis: Diese Anwendung erstellt nur Demonstrations-Visitenkarten.
+                {t("card.demoNotice")}
               </p>
 
-              <input type="text" name="vorname" placeholder="Vorname" value={formData.vorname} onChange={handleChange} required style={inputStyle} />
-              <input type="text" name="nachname" placeholder="Nachname" value={formData.nachname} onChange={handleChange} required style={inputStyle} />
-              <input type="text" name="wunschposition" placeholder="Position" value={formData.wunschposition} onChange={handleChange} required style={inputStyle} />
-              <input type="text" name="abteilung" placeholder="Abteilung" value={formData.abteilung} onChange={handleChange} style={inputStyle} />
-              <input type="tel" name="telefonnummer" placeholder="Mobil" value={formData.telefonnummer} onChange={handleChange} style={inputStyle} />
-              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="vorname" placeholder={t("card.firstname")} value={formData.vorname} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="nachname" placeholder={t("card.lastname")} value={formData.nachname} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="wunschposition" placeholder={t("card.position")} value={formData.wunschposition} onChange={handleChange} required style={inputStyle} />
+              <input type="text" name="abteilung" placeholder={t("card.department")} value={formData.abteilung} onChange={handleChange} style={inputStyle} />
+              <input type="tel" name="telefonnummer" placeholder={t("card.phone")} value={formData.telefonnummer} onChange={handleChange} style={inputStyle} />
+              <input type="email" name="email" placeholder={t("card.email")} value={formData.email} onChange={handleChange} required style={inputStyle} />
 
               <select name="firmaId" onChange={handleChange} required value={formData.firmaId} style={selectStyle}>
-                <option value="">Firma wählen</option>
+                <option value="">{t("card.dropdown")}</option>
                 {firmenListe.map(firma => (
                   <option key={firma.id} value={firma.id}>{firma.name}</option>
                 ))}
@@ -412,10 +429,10 @@ function App() {
 
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
                 <button type="button" onClick={handleReset} style={{ ...buttonStyle, backgroundColor: '#6c757d' }}>
-                  Zurücksetzen
+                  {t("card.reset")}
                 </button>
                 <button type="submit" style={buttonStyle}>
-                  Generieren
+                  {t("card.generate")}
                 </button>
               </div>
             </form>

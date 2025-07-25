@@ -36,5 +36,9 @@
   "card.qrScanHint": "Scan mit Kamera-App (funktioniert auf iOS & Android)",
   "card.backButton": "Zurück",
   "card.generate": "Generieren",
-  "card.reset": "Zurücksetzen"
+  "card.reset": "Zurücksetzen",
+
+  "privacyNoticeTitle": "Datenschutzhinweis",
+  "privacyNoticeText": "Diese Webseite verwendet keine Cookies und speichert alle eingegebenen Daten ausschließlich lokal in Ihrem Browser.\nDie Daten werden nicht an Server übertragen oder gespeichert.",
+  "privacyNoticeButton": "Akzeptieren"
 }

@@ -26,6 +26,8 @@ const bekannteFirmen = [
 // Neue Komponenten für rechtliche Absicherung
 const DatenschutzPopup = ({ onAccept }) => {
 
+  const { t } = useTranslation();
+
   return (
     <div style={{
       position: 'fixed',
@@ -47,10 +49,9 @@ const DatenschutzPopup = ({ onAccept }) => {
         maxHeight: '80vh',
         overflowY: 'auto'
       }}>
-        <h2>Datenschutzhinweis</h2>
-        <p>
-          Diese Webseite verwendet keine Cookies und speichert alle eingegebenen Daten ausschließlich lokal in Ihrem Browser.
-          Die Daten werden nicht an Server übertragen oder gespeichert.
+        <h2>{t("privacyNoticeTitle")}</h2>
+        <p style={{ whiteSpace: 'pre-line' }}>
+          {t("privacyNoticeText")}
         </p>
         <button
           onClick={onAccept}
@@ -64,7 +65,7 @@ const DatenschutzPopup = ({ onAccept }) => {
             marginTop: '20px'
           }}
         >
-          Hinweis akzeptieren
+          {t("privacyNoticeButton")}
         </button>
       </div>
     </div>
@@ -339,7 +340,15 @@ function App() {
 
   return (
     <>
-      <LanguageSelector></LanguageSelector>
+      {/* Language selector über dem Popup */}
+      <div style={{
+        position: 'fixed',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1100
+      }}>
+        <LanguageSelector />
+      </div>
       {showDatenschutz && <DatenschutzPopup onAccept={handleAcceptDatenschutz} />}
       {showImpressum && <ImpressumPopup onClose={() => setShowImpressum(false)} />}
 

@@ -1,67 +1,78 @@
-const express = require('express');
-const mysql = require('mysql2');
-const bodyParser = require('body-parser');
-const cors = require('cors');
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mysql = require('mysql2/promise');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(cors());
+app.use(express.json());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || 'https://qa-dgv.ned-it.de',
+  credentials: true
+}));
 
-// MySQL-Datenbankverbindung
-const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
+// MySQL: Connection Pool
+const pool = mysql.createPool({
+  host:     process.env.DB_HOST,
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-db.connect(err => {
-    if (err) {
-        console.error('Datenbankverbindung fehlgeschlagen:', err.message);
-    } else {
-        console.log('Verbunden mit MySQL-Datenbank');
-    }
+// Health (prüft DB erreichbar, blockiert aber nicht den Start)
+app.get('/api/health', async (_req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', env: process.env.NODE_ENV || 'qa' });
+  } catch (err) {
+    res.status(500).json({ status: 'db_error', message: err.message });
+  }
 });
 
-// API-Routen
-app.get('/api/firmen', (req, res) => {
-    db.query('SELECT * FROM firmen', (err, results) => {
-        if (err) {
-            res.status(500).send(err.message);
-        } else {
-            res.json(results);
-        }
-    });
+// Firmen abrufen
+app.get('/api/firmen', async (_req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM firmen');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
-app.post('/api/firmen', (req, res) => {
-    const { name, adresse } = req.body;
-    const sql = 'INSERT INTO firmen (name, adresse) VALUES (?, ?)';
-    db.query(sql, [name, adresse], (err, results) => {
-        if (err) {
-            res.status(500).send(err.message);
-        } else {
-            res.status(201).send('Firma hinzugefügt');
-        }
-    });
+// Firma anlegen
+app.post('/api/firmen', async (req, res) => {
+  const { name, adresse } = req.body;
+  try {
+    await pool.execute('INSERT INTO firmen (name, adresse) VALUES (?, ?)', [name, adresse]);
+    res.status(201).send('Firma hinzugefügt');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
-app.post('/api/daten', (req, res) => {
-    const { vorname, nachname, wunschposition, firmaId } = req.body;
-    const sql = 'INSERT INTO benutzerdaten (vorname, nachname, wunschposition, firmaId) VALUES (?, ?, ?, ?)';
-    db.query(sql, [vorname, nachname, wunschposition, firmaId], (err, results) => {
-        if (err) {
-            res.status(500).send(err.message);
-        } else {
-            res.status(201).send('Benutzerdaten hinzugefügt');
-        }
-    });
+// Benutzerdaten anlegen
+app.post('/api/daten', async (req, res) => {
+  const { vorname, nachname, wunschposition, firmaId } = req.body;
+  try {
+    await pool.execute(
+      'INSERT INTO benutzerdaten (vorname, nachname, wunschposition, firmaId) VALUES (?, ?, ?, ?)',
+      [vorname, nachname, wunschposition, firmaId]
+    );
+    res.status(201).send('Benutzerdaten hinzugefügt');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 app.listen(port, () => {
-    console.log(`Server läuft auf http://localhost:${port}`);
+  console.log(`dgv backend listening on ${port}`);
 });
+
+// Graceful shutdown
+const shutdown = async () => { try { await pool.end(); } finally { process.exit(0); } };
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);

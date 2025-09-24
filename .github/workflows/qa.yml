@@ -42,6 +42,12 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Validate required secrets
+        run: |
+          [ -n "${{ secrets.SSH_HOST }}" ] || { echo "Missing secret SSH_HOST"; exit 1; }
+          [ -n "${{ secrets.SSH_USER }}" ] || { echo "Missing secret SSH_USER"; exit 1; }
+          [ -n "${{ secrets.SSH_KEY }}" ]  || { echo "Missing secret SSH_KEY";  exit 1; }
+
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -50,10 +56,19 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-            docker login ghcr.io -u "${{ secrets.REGISTRY_USER }}" -p "${{ secrets.GHCR_TOKEN }}"
             cd /srv/docker/qa/dgv/compose
-            docker compose pull
-            docker compose up -d
+            echo "Working dir: $(pwd)"
+            ls -la
+
+            docker compose version
+
+            # GHCR login
+            docker login ghcr.io -u "${{ secrets.REGISTRY_USER }}" -p "${{ secrets.GHCR_TOKEN }}"
+
+            # explizit die Compose-Datei nutzen
+            [ -f docker-compose.qa.yml ] || { echo "compose file 'docker-compose.qa.yml' fehlt"; exit 1; }
+            docker compose -f docker-compose.qa.yml pull
+            docker compose -f docker-compose.qa.yml up -d
 
             # auf DB warten
             for i in $(seq 1 30); do
@@ -61,6 +76,6 @@ jobs:
               sleep 2
             done
 
-            # Tabellen idempotent anlegen (ohne Heredoc)
+            # Tabellen idempotent anlegen
             docker exec qa-dgv-db sh -lc 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "CREATE TABLE IF NOT EXISTS firmen (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, adresse VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"'
             docker exec qa-dgv-db sh -lc 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "CREATE TABLE IF NOT EXISTS benutzerdaten (id INT AUTO_INCREMENT PRIMARY KEY, vorname VARCHAR(100) NOT NULL, nachname VARCHAR(100) NOT NULL, wunschposition VARCHAR(190), firmaId INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_benutzerdaten_firma FOREIGN KEY (firmaId) REFERENCES firmen(id) ON DELETE SET NULL ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"'

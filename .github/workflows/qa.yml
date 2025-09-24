@@ -21,7 +21,6 @@ jobs:
         run: |
           set -e
           owner_lc=$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')
-
           if [ "${{ matrix.service }}" = "frontend" ]; then
             docker build \
               -t ghcr.io/${owner_lc}/dgv-frontend:qa \
@@ -39,7 +38,7 @@ jobs:
             docker push ghcr.io/${owner_lc}/dgv-backend:${{ github.sha }}
           fi
 
-    deploy:
+  deploy:
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -65,4 +64,3 @@ jobs:
             # Tabellen idempotent anlegen (ohne Heredoc)
             docker exec qa-dgv-db sh -lc 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "CREATE TABLE IF NOT EXISTS firmen (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(190) NOT NULL, adresse VARCHAR(255), created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"'
             docker exec qa-dgv-db sh -lc 'mysql -u"$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "CREATE TABLE IF NOT EXISTS benutzerdaten (id INT AUTO_INCREMENT PRIMARY KEY, vorname VARCHAR(100) NOT NULL, nachname VARCHAR(100) NOT NULL, wunschposition VARCHAR(190), firmaId INT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, CONSTRAINT fk_benutzerdaten_firma FOREIGN KEY (firmaId) REFERENCES firmen(id) ON DELETE SET NULL ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"'
-

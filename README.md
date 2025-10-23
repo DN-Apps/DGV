@@ -11,6 +11,8 @@ Die **digitale Visitenkarte** für modernes Netzwerken – schnell, stilvoll und
 Nutzer können ihre Kontaktdaten eingeben, ein Unternehmen auswählen und die digitale Karte direkt im Browser visualisieren.  
 Zusätzlich ermöglicht ein **Scan-to-Phone-Feature** den einfachen Transfer auf mobile Geräte.
 
+**Live-Link:** [https://dgv.ned-it.de](https://dgv.ned-it.de)
+
 **Zielgruppe:** Alle, die an Digitalisierung und modernen Networking-Lösungen interessiert sind.  
 
 ---
@@ -54,6 +56,8 @@ Besonders in einer Zeit, in der Mobilität und digitale Kommunikation im Vorderg
 The **digital business card** for modern networking – fast, stylish, and smart.  
 Users can enter their contact details, select a company, and visualize their digital card directly in the browser.  
 A **scan-to-phone feature** makes it easy to transfer the card to mobile devices.
+
+**Live-Link:** [https://dgv.ned-it.de](https://dgv.ned-it.de)
 
 **Target group:** People interested in digitalization and modern networking solutions.  
 
